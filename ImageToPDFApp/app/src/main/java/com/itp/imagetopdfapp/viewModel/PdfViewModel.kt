@@ -23,6 +23,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.DownloadManager
 import com.itp.imagetopdfapp.App
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -31,9 +33,10 @@ import kotlin.math.min
 
 class PdfViewModel : ViewModel() {
     var selectedImages by mutableStateOf<List<Uri>>(emptyList())
-    private set
+        private set
 
-    var lastPdf: File? = null
+    var lastPdf by mutableStateOf<File?>(null)
+        private set
 
     fun updateImages(images: List<Uri>) {
         selectedImages = images
@@ -47,7 +50,8 @@ class PdfViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             val result = generatePdf(context)
-            result.onSuccess { onSuccess(it) }
+            result.onSuccess {
+                onSuccess(it)}
                 .onFailure { onError(it.message ?: "오류") }
         }
     }
